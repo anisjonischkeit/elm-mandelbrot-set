@@ -11,7 +11,10 @@ type alias Point =
 
 
 
-
+-- TODO: Memoising this function will change the complexity of 
+-- this function to O(1) when rendering the second half 
+-- of the set and probably for whenever we go through the
+-- MUV loop
 testPoint iteration zR zX x y =
     let 
         cR = x/120
@@ -20,7 +23,7 @@ testPoint iteration zR zX x y =
         newZR = zR^2 - 1 * zX^2 + cR
         newZX = 2 * zR * zX + cX
     in
-        if iteration > 100
+        if iteration > 50
         then True
         else
             if zR > 2
@@ -38,13 +41,13 @@ isPointInSet = testPoint 0 0 0
 
 
 
-createRow : Float -> Float -> Float -> Int -> List Point
-createRow x y interval itemsLeft =
-    if itemsLeft <= 0 
+createRow : Float -> Float -> Float -> Float -> List Point
+createRow x y interval lastItem =
+    if x > lastItem 
     then []
     else 
         let 
-            rowTail = createRow (x + interval) y interval (itemsLeft - 1)
+            rowTail = createRow (x + interval) y interval lastItem
         in 
             if isPointInSet x y
             then { on = True } :: rowTail
@@ -54,11 +57,11 @@ createRow x y interval itemsLeft =
 
 getPoints : Int -> Int -> Float -> Float -> Float -> Float -> List (List Point)
 getPoints width height startX startY endX endY = 
-    if startY <= -((toFloat height)/2)
+    if startY < endY
     then []
     else 
         let 
-            firstRow = (createRow startX startY 1 width)
+            firstRow = (createRow startX startY 1 endX)
             rowsTail = (getPoints width height startX (startY - 1) endX endY)
         in
             firstRow :: rowsTail 
