@@ -48,8 +48,10 @@ getPointsHtml w h zoom (focusPointX, focusPointY) =
         endY = (toFloat focusPointY) - (halfHeight / (toFloat zoom))
 
         interval = 1 / toFloat zoom
+
+        maxIterations = 50
     in
-        getPoints interval w h startX startY endX endY
+        getPoints interval w h startX startY endX endY maxIterations
         |> List.indexedMap 
             (\rowNo row -> 
                 row |> List.indexedMap (\colNo point ->
@@ -60,7 +62,7 @@ getPointsHtml w h zoom (focusPointX, focusPointY) =
                         , height "1"
                         , fill <| case point.result of
                             InSet -> "rgba(0,0,0,1)"
-                            NotInSet iterations ->  "rgba(0,0,0," ++ ((toFloat iterations)/1000 |> String.fromFloat) ++ ")"
+                            NotInSet iterations ->  "rgba(0,0,0," ++ ((toFloat iterations)/maxIterations |> String.fromFloat) ++ ")"
                         ]
                         []
                 )
@@ -80,4 +82,4 @@ view model =
             , height stringCanvasHeight
             , viewBox ("0 0 " ++ stringCanvasWidth ++ stringCanvasHeight)
             ]
-            (getPointsHtml canvasWidth canvasHeight 300 (40, 50))
+            (getPointsHtml canvasWidth canvasHeight 1 (0, 0))
