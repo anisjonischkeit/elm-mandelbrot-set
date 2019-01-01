@@ -17,14 +17,14 @@ testPoint iteration zR zX x y =
         cR = x/120
         cX = y/120
 
-        newZR = zR^2 + -1 * zX^2 + cR
-        newZX = 2*zR*zX + cX
+        newZR = zR^2 - 1 * zX^2 + cR
+        newZX = 2 * zR * zX + cX
     in
-        if iteration > 50
-        then False
+        if iteration > 100
+        then True
         else
             if zR > 2
-            then True
+            then False
             else 
                 testPoint (iteration + 1) newZR newZX x y
 
@@ -43,14 +43,22 @@ createRow x y interval itemsLeft =
     if itemsLeft <= 0 
     then []
     else 
-        if isPointInSet x y
-        then { on = True } :: createRow (x + interval) y interval (itemsLeft - 1)
-        else { on = False } :: createRow (x + interval) y interval (itemsLeft - 1)
-
+        let 
+            rowTail = createRow (x + interval) y interval (itemsLeft - 1)
+        in 
+            if isPointInSet x y
+            then { on = True } :: rowTail
+            else { on = False } :: rowTail
 
 
 
 getPoints : Int -> Int -> Float -> Float -> Float -> Float -> List (List Point)
-getPoints width height startX startY endX endY
-    = createRow startX 60 1 width
-        |> List.repeat height
+getPoints width height startX startY endX endY = 
+    if startY <= -((toFloat height)/2)
+    then []
+    else 
+        let 
+            firstRow = (createRow startX startY 1 width)
+            rowsTail = (getPoints width height startX (startY - 1) endX endY)
+        in
+            firstRow :: rowsTail 

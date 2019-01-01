@@ -34,7 +34,7 @@ update msg model =
 -- VIEW
 
 getPointsHtml = 
-    getPoints 120 120 0 0 0 0
+    getPoints 480 360 -240 180 0 0
     |> List.indexedMap 
         (\rowNo row -> 
             row |> List.indexedMap (\colNo point ->
@@ -53,9 +53,9 @@ getPointsHtml =
 view : Model -> Html Msg
 view model =
   svg
-    [ width "120"
-    , height "120"
-    , viewBox "0 0 120 120"
+    [ width "480"
+    , height "360"
+    , viewBox "0 0 480 360"
     ]
     getPointsHtml
 
