@@ -11,59 +11,29 @@ type alias Point =
 
 
 
-{-
 
-
-int testmal(float realx, float imgx, int k)
-{
-	int i;
-	float re,im,re2,im2;
-	
-	re = realx; x
-	im = imgx; y
-
-	for(i=0;i<2-k;i++)
-	{
-		re2 = re*re;
-		im2 = im*im;
-		if ((re2+im2) > 256)
-		{
-			return 1;
-		}
-		im = 2*re*im + imgx; y
-		re = re2 - im2 + realx; x
-	}
-	return(0);
-}	
-
--}
-
-
-
-testPoint iteration x y =
+testPoint iteration zR zX x y =
     let 
-        x2 = x^2
-        y2 = y^2
+        cR = x/120
+        cX = y/120
+
+        newZR = zR^2 + -1 * zX^2 + cR
+        newZX = 2*zR*zX + cX
     in
-        if iteration <= 0
+        if iteration > 50
         then False
         else
-            if (x2 + y2) > 256
+            if zR > 2
             then True
             else 
-                let 
-                    nextX = x2 - y2 + x
-                    nextY = 2 * x * y + y
-
-                in
-                    testPoint (iteration - 1) nextX nextY
+                testPoint (iteration + 1) newZR newZX x y
 
 
 
 
 
 isPointInSet : Float -> Float -> Bool
-isPointInSet = testPoint 50
+isPointInSet = testPoint 0 0 0
     
 
 
