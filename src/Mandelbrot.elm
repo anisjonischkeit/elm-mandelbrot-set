@@ -15,53 +15,53 @@ type alias Point =
 -- this function to O(1) when rendering the second half 
 -- of the set and probably for whenever we go through the
 -- MUV loop
-testPoint iteration zR zX x y =
+testPoint iteration zR zX magnification x y =
     let 
-        cR = x/120
-        cX = y/120
+        cR = x/magnification
+        cX = y/magnification
 
         newZR = zR^2 - 1 * zX^2 + cR
         newZX = 2 * zR * zX + cX
     in
-        if iteration > 50
+        if iteration > 1000
         then True
         else
             if zR > 2
             then False
             else 
-                testPoint (iteration + 1) newZR newZX x y
+                testPoint (iteration + 1) newZR newZX magnification x y
 
 
 
 
 
-isPointInSet : Float -> Float -> Bool
+isPointInSet : Float -> Float -> Float -> Bool
 isPointInSet = testPoint 0 0 0
     
 
 
 
-createRow : Float -> Float -> Float -> Float -> List Point
-createRow x y interval lastItem =
+createRow : Float -> Float -> Float -> Float -> Float -> List Point
+createRow x y interval lastItem magnification =
     if x > lastItem 
     then []
     else 
         let 
-            rowTail = createRow (x + interval) y interval lastItem
+            rowTail = createRow (x + interval) y interval lastItem magnification
         in 
-            if isPointInSet x y
+            if isPointInSet magnification x y
             then { on = True } :: rowTail
             else { on = False } :: rowTail
 
 
 
-getPoints : Int -> Int -> Float -> Float -> Float -> Float -> List (List Point)
-getPoints width height startX startY endX endY = 
+getPoints : Float -> Int -> Int -> Float -> Float -> Float -> Float -> List (List Point)
+getPoints interval width height startX startY endX endY = 
     if startY < endY
     then []
     else 
         let 
-            firstRow = (createRow startX startY 1 endX)
-            rowsTail = (getPoints width height startX (startY - 1) endX endY)
+            firstRow = createRow startX startY interval endX (toFloat width / 4)
+            rowsTail = getPoints interval width height startX (startY - interval) endX endY
         in
             firstRow :: rowsTail 

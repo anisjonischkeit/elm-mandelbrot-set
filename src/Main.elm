@@ -33,13 +33,23 @@ update msg model =
 
 -- VIEW
 
-getPointsHtml : Int -> Int -> List (Html Msg)
-getPointsHtml w h  = 
+-- TODO: focus point should be relative to the numbering system used by the mandelbrot set
+-- rather than the pixels. This will make movements more consistant rahter than being slow
+-- the beginning and really fast when zoomed
+getPointsHtml : Int -> Int -> Int -> (Int, Int) -> List (Html Msg)
+getPointsHtml w h zoom (focusPointX, focusPointY) = 
     let 
         halfHeight = (toFloat h) / 2
         halfWidth = (toFloat w) / 2
+
+        startX = (toFloat focusPointX) - (halfWidth / (toFloat zoom))  -- x starts at a negative           +y/2
+        endX = (toFloat focusPointX) + (halfWidth / (toFloat zoom))    --                            -x/2 ---|--- +x/2
+        startY = (toFloat focusPointY) + (halfHeight / (toFloat zoom)) -- y starts at a positive           -y/2
+        endY = (toFloat focusPointY) - (halfHeight / (toFloat zoom))
+
+        interval = 1 / toFloat zoom
     in
-        getPoints w h -halfWidth halfHeight halfWidth -halfHeight
+        getPoints interval w h startX startY endX endY
         |> List.indexedMap 
             (\rowNo row -> 
                 row |> List.indexedMap (\colNo point ->
@@ -68,4 +78,4 @@ view model =
             , height stringCanvasHeight
             , viewBox ("0 0 " ++ stringCanvasWidth ++ stringCanvasHeight)
             ]
-            (getPointsHtml canvasWidth canvasHeight)
+            (getPointsHtml canvasWidth canvasHeight 300 (40, 50))
