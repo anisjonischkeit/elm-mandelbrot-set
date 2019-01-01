@@ -2,7 +2,7 @@ import Browser
 import Html exposing (Html)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
-import Mandelbrot exposing (getPoints)
+import Mandelbrot exposing (getPoints, MandelbrotPixel(..))
 
 main =
   Browser.sandbox { init = init, update = update, view = view }
@@ -58,7 +58,9 @@ getPointsHtml w h zoom (focusPointX, focusPointY) =
                         , y (String.fromInt rowNo)
                         , width "1"
                         , height "1"
-                        , fill <| if point.on then "green" else "none"
+                        , fill <| case point.result of
+                            InSet -> "rgba(0,0,0,1)"
+                            NotInSet iterations ->  "rgba(0,0,0," ++ ((toFloat iterations)/1000 |> String.fromFloat) ++ ")"
                         ]
                         []
                 )

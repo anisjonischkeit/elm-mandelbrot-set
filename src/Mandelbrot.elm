@@ -1,12 +1,15 @@
-module Mandelbrot exposing (getPoints)
+module Mandelbrot exposing (getPoints, MandelbrotPixel(..))
 
 {- 
 From: https://hardmath123.github.io/scratch-mandelbrot.html
 -}
 
+type MandelbrotPixel
+    = InSet
+    | NotInSet Int
 
 type alias Point = 
-    { on: Bool 
+    { result: MandelbrotPixel 
     }
 
 
@@ -15,6 +18,7 @@ type alias Point =
 -- this function to O(1) when rendering the second half 
 -- of the set and probably for whenever we go through the
 -- MUV loop
+testPoint : Int -> Float -> Float -> Float -> Float -> Float -> MandelbrotPixel
 testPoint iteration zR zX magnification x y =
     let 
         cR = x/magnification
@@ -22,12 +26,13 @@ testPoint iteration zR zX magnification x y =
 
         newZR = zR^2 - 1 * zX^2 + cR
         newZX = 2 * zR * zX + cX
+        maxIterations = 1000
     in
-        if iteration > 1000
-        then True
+        if iteration > maxIterations
+        then InSet
         else
             if zR > 2
-            then False
+            then NotInSet iteration
             else 
                 testPoint (iteration + 1) newZR newZX magnification x y
 
@@ -35,8 +40,8 @@ testPoint iteration zR zX magnification x y =
 
 
 
-isPointInSet : Float -> Float -> Float -> Bool
-isPointInSet = testPoint 0 0 0
+getPixelValue : Float -> Float -> Float -> MandelbrotPixel
+getPixelValue = testPoint 0 0 0
     
 
 
@@ -49,9 +54,7 @@ createRow x y interval lastItem magnification =
         let 
             rowTail = createRow (x + interval) y interval lastItem magnification
         in 
-            if isPointInSet magnification x y
-            then { on = True } :: rowTail
-            else { on = False } :: rowTail
+            { result = getPixelValue magnification x y } :: rowTail
 
 
 
